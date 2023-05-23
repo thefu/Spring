@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+
+
+<!--    设置别名-->
+    <typeAliases>
+        <package name="com.bjpowernode.domain"/>
+    </typeAliases>
+
+
+    <!--sql mapper(sql映射文件)的位置-->
+    <mappers>
+<!--       <mapper resource="com\bjpowernode\dao\StudentDao.xml"/>-->
+<!--            <package name="com.bjpowernode.dao"/>-->
+<!--        <mapper resource="com\bjpowernode\dao\SaleDao.xml"/>-->
+        <mapper resource="com\bjpowernode\dao\GoodsDao.xml"/>
+        <mapper resource="com\bjpowernode\dao\SaleDao.xml"/>
+    </mappers>
+</configuration>
+

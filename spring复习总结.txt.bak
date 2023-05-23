@@ -1,0 +1,160 @@
+spring是为了解决企业级开发得难度而生得一种框架，减轻对项目模块之间的管理，
+	类和类之间的管理，帮助开发人员创建对象，管理对象之间的关系。
+	spring 核心技术 ioc , aop,能实现模块之间，类之间的解耦合
+
+spring中得ioc用于创建对象，全称是Inversion of Control，意思是控制反转
+
+spring中创建对象有两种方式
+	1.在配置文件中设置
+		
+		 告诉spring创建对象
+		 声明bean，就是告诉spring要创建某个类的对象
+		 id:对象的自定义名称，唯一值。spring通过这个名称找到对象
+		 class:类的全限定名称（不能是接口，spring是反射机制，必须使用类）
+
+		 spring就完成 SomeService someService = new SomeService();
+		 spring是把创建好的对象放入到map中，spring框架有一个map存放对象的。
+		     springMap.out(id的值，对象);
+		     例如 springMap.put("someService",new SomeServiceImpl());
+
+		 一个bean标签声明一个对象。
+	
+		<bean id="someService" class="com.bjpowernode.service.impl.SomeServiceImpl"/>
+
+	2.使用注解的方式
+
+
+ioc的技术实现是di（依赖注入），表明创建对象，给属性赋值
+	依赖注入，只需要在程序中提供要使用的对象的名称就可以，至于对象如何在容器中创建，
+	赋值，查找都由容器内部实现
+
+di的实现方式有两种：
+	1.在配置文件中，使用标签和属性完成，叫做基于XML的di实现
+	2.使用注解，完成属性赋值，叫做基于注解的di实现
+
+	在配置文件中设置时，如果是简单类型（String和Java中的基本数据类型都是简单类型）
+	则使用如下：
+		 1）简单类型的set注入
+	<bean id = "xx" class = "yyy">
+            <property name = "属性名字" value = "此属性的值"/>
+            一个properyy只能给一个属性赋值
+            </property>
+        </bean>
+
+	如果是引用类型：
+		2)引用类型的注入：spring调用类的set方法
+        <bean id = "xx" class = "yyy">
+            <property name = "属性名字" ref = "bean的id(对象的名称)"/>
+        </bean>
+
+	前面所使用的都是set注入方法，顾名思义，在对一个对象进行赋值时，是使用的里面的set方法进行赋值
+	还有一种方法，就是使用构造方法（这里的构造方法是有参数的构造方法）在创建对象的同时，在构造方法中
+	给属性赋值
+		构造注入使用<constructor-arg>标签
+            <constructor-arg>标签：一个<constructor-arg>表示构造方法一个参数
+            <constructor-arg>标签属性：
+                name:表示构造方法的形参名
+                index:表示构造方法的参数位置，参数从左往右位置是 0 ，1 ，2的顺序
+                value:构造方法的形参类型是简单类型的，使用value
+                ref:构造方法的形参类型是引用类型的，使用ref
+	
+	引用类型除了上面的方法进行注入以外，还可以自动注入
+	引用类型的自动注入：spring框架根据某些规则可以给引用类型赋值，不用再给引用类型赋值了
+
+        使用的规则常用的是byName,byType。
+            1.byName（按名称注入）：Java类中引用类型的属性名和spring容器中（配置文件）<bean>的id名称一样
+                                    且数据类型是一致的，这样的容器中的bean，spring能够赋值给引用类型
+
+                    语法：
+                    <bean id="yyy" class="xxx" autowire="byName">
+                        简单类型属性赋值
+                    </bean>
+
+            2.byType（按类型注入）：Java类中引用类型的数据类型和spring容器中（配置文件）<bean>的class属性
+                                     是同源关系的，这样的bean能够赋值给引用类型
+              同源就是一类的意思：
+                1.Java类中引用类型的数据类型和class类型的值是一样的
+                2.Java类中引用类型的数据类型和class类型的值是父子类关系的
+                3.Java类中引用类型的数据类型和class类型的值是接口和实现类关系的
+              语法：
+                <bean id="yyy" class="xxx" autowire="byType">
+                        简单类型属性赋值
+                </bean>
+
+	注意：在byType中，在xml配置文件中声明bean只能有一个符合条件的，多余一个是错误的，（注意父子类同时存在也会出现错误）
+
+
+	有时候会使用包含关系的配置文件，一般都是一个主配置文件，包含其他对象配置文件
+	包含关系的配置文件：
+	spring-total表示主配置文件：包含其他的配置文件的，主配置文件一般是不定义对象的。
+	语法：
+        <import resource = "其他配置文件的路劲"/>
+        关键字：“classpath:” 表示类路径（class文件所在的目录）
+        在spring的配置文件中要指定其他的位置，需要使用classpath，告诉spring到哪里去加载读取文件
+
+	
+
+	第二种方式，使用注解，通过spring的注解完成对Java对象的创建，属性。代替xml文件
+
+	但这时，同样也需要spring的配置文件，只是声明不同，但也可以声明对象，若使用注解的方式，则需要
+	在配置文件中声明组件扫描器（component-scan）,组件就是Java对象
+	例子： <context:component-scan base-package="com.bjpowernode.ba07"/>
+	base-package:指定你所使用的注解的包名
+	component-scan工作方式：spring会扫描遍历base-package指定的包
+		把包中和子包中所有的类，找到类中的注解，按照注解的功能创建对象，或者是给属性赋值
+
+
+	Component：创建对象的，等同于<bean>的功能
+              属性：value就是对象的名称，也就是<bean>的id值
+                  value的值是唯一的，创建的对象在整个spring容器中就一个
+	@Component(value = "myStudent")等同于
+	<bean id = "myStudent" class= "com.bjpowernode.ba01.Student"/>
+
+	spring中和@Component功能一致，创建对象的注解还有：
+	1.@Repository(用在持久层类的上面)：放在dao的实现类上面，表示创建dao对象，dao对象是能访问数据库的
+	2.@Service(用在业务层类的上面)：放在service的实现类上面，表示创建service对象，service对象是做业务处理的，可以有事务等功能的
+	3.@Controller(用在控制器的上面)：放在控制器（处理器）类的上面，创建控制器对象的，控制器对象，能够接收用户提交的参数，显示请求处理的结果
+
+	以上三个注解的使用语法，和Component是一样的，都能够创建对象，但是这三个注解，还有额外的功能。
+	@Repository、@Service、@Controller是给项目的对象分层的
+
+	使用@value： 进行简单类型的属性赋值
+		属性：value是String类型的，表示简单类型的属性值
+		位置：1.在属性定义的上面，无需set方法，推荐使用
+			2.在set方法上面
+
+	引用类型
+	@Autowired: spring框架提供的注解，实现引用类型的赋值。
+	spring中通过注解给引用类型赋值，使用的是自动注入原理，支持byName,byType
+	@Autowired:默认使用的是byType自动注入。
+
+	属性：required ,是一个Boolean类型的，默认true
+          required=true：表示引用类型赋值失败，程序报错，并终止执行
+          required=false：引用类型如果赋值失败，程序正常执行，引用类型是null
+     
+	位置：
+	     1）在属性定义的上面，无需set方法，推荐使用
+	     2）在set方法上面
+
+	如果要使用byName方式，需要做的是：
+       1.在属性上面加入@Autowired
+       2.在属性上面加入@Qualifier(value="bean的id")：表示使用指定名称的bean完成赋值注入
+           上面两者没有先后顺序
+
+
+	引用类型还可以使用另外一种注解
+	引用类型
+      @Resoource： 来自jdk中的注解，spring框架提供了对这个注解的功能支持，可以使用它给引用类型赋值
+                   使用的也是自动注入原理，支持byName,byType,默认是byName
+      位置：1.在属性定义的上面，无需set方法，推荐使用
+           2.在set方法的上面
+
+	   默认是byName：先使用byName自动注入，如果byName赋值失败，再使用byType
+
+
+
+
+	
+
+
+   
